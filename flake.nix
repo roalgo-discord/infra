@@ -27,10 +27,20 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
+    nixpkgs-terraform-providers-bin = {
+      url = "github:nix-community/nixpkgs-terraform-providers-bin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
     quadlet-nix.url = "github:SEIAROTg/quadlet-nix";
 
     aoc-bot = {
       url = "github:susanthenerd/aoc_bot";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    arhiva-educationala = {
+      url = "github:roalgo-discord/arhiva-educationala";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -47,6 +57,8 @@
       agenix-rekey,
       quadlet-nix,
       aoc-bot,
+      nixpkgs-terraform-providers-bin,
+      arhiva-educationala,
       ...
     }:
     flake-parts.lib.mkFlake { inherit inputs; } (top: {
@@ -65,16 +77,23 @@
           in
           nixpkgs.lib.nixosSystem {
             inherit system;
+            specialArgs = {
+              inherit arhiva-educationala;
+            };
+
             modules = [
               srvos.nixosModules.server
               srvos.nixosModules.mixins-systemd-boot
 
               ./nixos/hetzner-vm.nix
+
               disko.nixosModules.disko
               agenix.nixosModules.default
               agenix-rekey.nixosModules.default
               quadlet-nix.nixosModules.quadlet
               aoc-bot.nixosModules.default
+              arhiva-educationala.nixosModules.default
+
             ];
           };
 
@@ -93,6 +112,7 @@
           ...
         }:
         {
+
           terranix.terranixConfigurations."hetzner-vm" = {
             modules = [ ./terraform/config.nix ];
 
@@ -100,7 +120,8 @@
               p.external
               p.local
               p.null
-              p.hcloud
+
+              nixpkgs-terraform-providers-bin.legacyPackages.${system}.providers.hetznercloud.hcloud
             ]);
 
             terraformWrapper.extraRuntimeInputs = [

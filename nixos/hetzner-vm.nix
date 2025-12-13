@@ -3,9 +3,9 @@
   config,
   pkgs,
   lib,
+  arhiva-educationala,
   ...
 }:
-
 {
 
   imports = [
@@ -68,7 +68,6 @@
   };
 
   system.stateVersion = "25.11";
-  networking.useDHCP = lib.mkDefault true;
 
   systemd.network = {
     enable = true;
@@ -89,9 +88,70 @@
     };
   };
 
+  networking = {
+    useDHCP = lib.mkDefault true;
+
+    nat = {
+      enable = true;
+      internalInterfaces = [ "ve-+" ];
+      externalInterface = "enp1s0";
+      enableIPv6 = true;
+    };
+  };
+
   services.aoc-bot = {
     enable = true;
     environmentFiles = [ config.age.secrets.aoc_bot_env.path ];
+  };
+
+  networking.firewall.allowedTCPPorts = [ 80 ];
+
+  services.caddy = {
+    enable = true;
+    # Only HTTP is needed; TLS will be handled separately if required.
+    globalConfig = ''
+      {
+        auto_https off
+      }
+    '';
+
+    virtualHosts.":80".extraConfig = ''
+      reverse_proxy 10.231.136.2:3000
+    '';
+  };
+
+  containers.arhiva = {
+    autoStart = true;
+    privateNetwork = true;
+    hostAddress = "10.231.136.1";
+    localAddress = "10.231.136.2";
+    hostAddress6 = "fc00::1";
+    localAddress6 = "fc00::2";
+
+    config =
+      {
+        config,
+        pkgs,
+        lib,
+        ...
+      }:
+      {
+        imports = [ arhiva-educationala.nixosModules.default ];
+        services = {
+          arhiva-educationala.enable = true;
+          resolved.enable = true;
+        };
+
+        networking = {
+          firewall.allowedTCPPorts = [ 3000 ];
+
+          # Use systemd-resolved inside the container
+          # Workaround for bug https://github.com/NixOS/nixpkgs/issues/162686
+          useHostResolvConf = lib.mkForce false;
+        };
+
+        system.stateVersion = "25.11";
+      };
   };
 
 }
