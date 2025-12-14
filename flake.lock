@@ -78,11 +78,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1765622919,
-        "narHash": "sha256-lsv1tKqELQ4Z/cIK32O1OHar8jqbzC8OqRfmYHTZ2Ag=",
+        "lastModified": 1765642265,
+        "narHash": "sha256-umesPK8vdnFKgCqNlqImpYzZsA8EEMhYg1XOiCdwloI=",
         "owner": "roalgo-discord",
         "repo": "arhiva-educationala",
-        "rev": "3f5a88a0453e009c6c371f23d60c58a2e45a3893",
+        "rev": "59fe2d15de4d92460fa768940ab6bdb62284df54",
         "type": "github"
       },
       "original": {

@@ -85,6 +85,28 @@
               srvos.nixosModules.server
               srvos.nixosModules.mixins-systemd-boot
 
+              {
+                nix.settings = {
+                  substituters = [
+                    "https://nix-community.cachix.org"
+                    "https://devenv.cachix.org"
+                    "https://cache.nixos.org"
+                    "https://microvm.cachix.org"
+                  ];
+                  trusted-public-keys = [
+                    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+                    "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw="
+                    "microvm.cachix.org-1:oXnBc6hRE3eX5rSYdRyMYXnfzcCxC7yKPTbZXALsqys="
+                  ];
+
+                  experimental-features = [
+                    "nix-command"
+                    "flakes"
+                  ];
+                  auto-optimise-store = true;
+                };
+              }
+
               ./nixos/hetzner-vm.nix
 
               disko.nixosModules.disko

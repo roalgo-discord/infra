@@ -104,22 +104,17 @@
     environmentFiles = [ config.age.secrets.aoc_bot_env.path ];
   };
 
-  networking.firewall.allowedTCPPorts = [ 80 ];
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
 
   services.caddy = {
     enable = true;
-    # Only HTTP is needed; TLS will be handled separately if required.
     globalConfig = ''
-      {
-        auto_https off
-      }
+      email admin@roalgo.ro
     '';
-
-    virtualHosts.":80".extraConfig = ''
+    virtualHosts."edu.roalgo.ro".extraConfig = ''
       reverse_proxy 10.231.136.2:3000
     '';
   };
-
   containers.arhiva = {
     autoStart = true;
     privateNetwork = true;
@@ -127,6 +122,13 @@
     localAddress = "10.231.136.2";
     hostAddress6 = "fc00::1";
     localAddress6 = "fc00::2";
+
+    forwardPorts = [
+      {
+        hostPort = 3000;
+        containerPort = 3000;
+      }
+    ];
 
     config =
       {
@@ -153,5 +155,4 @@
         system.stateVersion = "25.11";
       };
   };
-
 }

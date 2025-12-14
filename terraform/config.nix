@@ -52,7 +52,6 @@ in
 
     target_host = "\${hcloud_server.hetzner_vm.ipv4_address}";
 
-    build_on_remote = true;
     debug_logging = true;
   };
 
